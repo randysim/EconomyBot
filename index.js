@@ -127,7 +127,41 @@ client.on("message", async (message) => {
             SuccessEmbed.setDescription("You have given " + Money + " discord coins to " + Mentioned.user.username);
             message.channel.send(SuccessEmbed);
         }
+
+        if (args[0] == "bal") {
+            // Action Here
+            let UserJSON = JSON.parse(Fs.readFileSync("./DB/users.json"));
+
+            if (!UserJSON[message.author.id]) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("You must be playing the game.");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+            let mentioned = message.mentions.members.first();
+            if (mentioned) {
+                if (!UserJSON[mentioned.id]) {
+                    let ErrorEmbed = new Discord.MessageEmbed();
+                    ErrorEmbed.setTitle("**ERROR**");
+                    ErrorEmbed.setDescription("That person is not playing the game.");
+                    message.channel.send(ErrorEmbed);
+                    return;
+                }
+                let SuccessEmbed = new Discord.MessageEmbed();
+                SuccessEmbed.setTitle("**SUCCESS**");
+                SuccessEmbed.addField("Balance", UserJSON[mentioned.id].bal);
+                message.channel.send(SuccessEmbed);
+                return;
+            } else {
+                let SuccessEmbed = new Discord.MessageEmbed();
+                SuccessEmbed.setTitle("**SUCCESS**");
+                SuccessEmbed.addField("Balance", UserJSON[message.author.id].bal);
+                message.channel.send(SuccessEmbed);
+                return;
+            }
+        }
     }
 })
 
-client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.PJIB4pnO6i3ypkzqws1rgZEVpD8");
+client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.HQMJWHcgO8LsX7osxzf0lSoifGM");
