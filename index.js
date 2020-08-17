@@ -31,6 +31,7 @@ client.on("message", async (message) => {
             UserJSON[message.author.id] = {
                 bal: 0,
                 lastclaim: 0,
+                workers: 0,
             }
             Fs.writeFileSync("./DB/users.json", JSON.stringify(UserJSON));
 
@@ -161,7 +162,77 @@ client.on("message", async (message) => {
                 return;
             }
         }
+        if (args[0] == "buy") {
+            let UserJSON = JSON.parse(Fs.readFileSync("./DB/users.json"));
+
+            if (!UserJSON[message.author.id]) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("You must be playing the game.");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+
+            let item = args[1];
+            let amount = args[2];
+
+            if (!item) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("Please specify an item.");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+            if (!amount) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("Please specify an amount");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+            if (isNaN(amount)) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("Please specify a number");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+            if (amount == 0 || amount.indexOf("-") != -1 || amount.indexOf(".") != -1) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("Please specify an integer value greater than 0.");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+
+            switch (item) {
+                case "worker":
+                    if (7 * parseInt(amount) > UserJSON[message.author.id].bal) {
+                        let ErrorEmbed = new Discord.MessageEmbed();
+                        ErrorEmbed.setTitle("**ERROR**");
+                        ErrorEmbed.setDescription("You do not have enough money");
+                        message.channel.send(ErrorEmbed);
+                        return;
+                    }
+
+                    UserJSON[message.author.id].workers += parseInt(amount);
+                    UserJSON[message.author.id].bal -= parseInt(amount) * 7;
+                    Fs.writeFileSync("./DB/users.json", JSON.stringify(UserJSON));
+
+                    let SuccessEmbed = new Discord.MessageEmbed();
+                    SuccessEmbed.setTitle("**SUCCESS**");
+                    SuccessEmbed.setDescription(`You have bought ${amount} ${item}s.`);
+                    message.channel.send(SuccessEmbed);
+                    break;
+                default:
+                    let ErrorEmbed = new Discord.MessageEmbed();
+                    ErrorEmbed.setTitle("**ERROR**");
+                    ErrorEmbed.setDescription("The item you are trying to buy does not exist.");
+                    message.channel.send(ErrorEmbed);
+                    return;
+            }
+        }
     }
 })
 
-client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.HQMJWHcgO8LsX7osxzf0lSoifGM");
+client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.2zDArpixIEB2GArCLGAzg5n1W9s");
