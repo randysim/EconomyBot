@@ -25,12 +25,14 @@ client.on("message", async (message) => {
                 let WarningEmbed = new Discord.MessageEmbed();
                 WarningEmbed.setTitle("**ERROR**");
                 WarningEmbed.setDescription("You already started");
+                message.channel.send(WarningEmbed);
                 return;
             }
 
             UserJSON[message.author.id] = {
                 bal: 0,
                 lastclaim: 0,
+                lastwork: 0,
                 workers: 0,
             }
             Fs.writeFileSync("./DB/users.json", JSON.stringify(UserJSON));
@@ -232,7 +234,36 @@ client.on("message", async (message) => {
                     return;
             }
         }
+        if (args[0] == "work") {
+            let UserJSON = JSON.parse(Fs.readFileSync("./DB/users.json"));
+
+            if (!UserJSON[message.author.id]) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription("You must be playing the game.");
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+
+            let deltaTime = Math.floor((new Date().getTime() - UserJSON[message.author.id].lastwork) / (1000 * 60));
+            if (deltaTime < 30) {
+                let ErrorEmbed = new Discord.MessageEmbed();
+                ErrorEmbed.setTitle("**ERROR**");
+                ErrorEmbed.setDescription(`You can work in ${30 - deltaTime} minutes.`);
+                message.channel.send(ErrorEmbed);
+                return;
+            }
+
+            UserJSON[message.author.id].bal += (UserJSON[message.author.id].workers + 1) * 2;
+            UserJSON[message.author.id].lastwork = new Date().getTime();
+            Fs.writeFileSync("./DB/users.json", JSON.stringify(UserJSON));
+
+            let SuccessEmbed = new Discord.MessageEmbed();
+            SuccessEmbed.setTitle("**SUCCESS**");
+            SuccessEmbed.setDescription(`You have earned ${(UserJSON[message.author.id].workers + 1) * 2} Discord Coins`);
+            message.channel.send(SuccessEmbed);
+        }
     }
 })
 
-client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.2zDArpixIEB2GArCLGAzg5n1W9s");
+client.login("Your Token");
