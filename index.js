@@ -263,7 +263,21 @@ client.on("message", async (message) => {
             SuccessEmbed.setDescription(`You have earned ${(UserJSON[message.author.id].workers + 1) * 2} Discord Coins`);
             message.channel.send(SuccessEmbed);
         }
+        if (args[0] == "lb") {
+            let UserJSON = JSON.parse(Fs.readFileSync("./DB/users.json"));
+            var Sorted = Object.entries(UserJSON).sort((a, b) => b[1].bal - a[1].bal);
+            if (Sorted.length > 10) Sorted = Sorted.slice(0, 10);
+
+            var LBString = "";
+            Sorted.forEach(user => {
+                LBString += `${client.users.cache.find(u => u.id == user[0])} - ${user[1].bal}\n`;
+            });
+            var LBEmbed = new Discord.MessageEmbed()
+                .setTitle("**Leaderboard**")
+                .setDescription(LBString);
+            message.channel.send(LBEmbed);
+        }
     }
 })
 
-client.login("Your Token");
+client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.Tb7R5uVvXsGNmU2tvTvgyjQF4RQ");
