@@ -280,4 +280,4 @@ client.on("message", async (message) => {
     }
 })
 
-client.login("NzQwOTA5MjU4MDk4NDc1MTA4.Xyv3hA.Tb7R5uVvXsGNmU2tvTvgyjQF4RQ");
+client.login("ODIyMTQ4NjAwOTM0NDMyODI4.YFODjQ.eWkDIV9r-NSzZUfoHlwfqN42Jtc");
